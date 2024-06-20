@@ -2,9 +2,9 @@ name: CLI Ubuntu Runner
 
 on:  
   push:
-    branches: [QA]
+    branches: [ main]
   pull_request:
-    branches: [QA]
+    branches: [ main ]
 
 jobs:
   trigger_pipeline:
