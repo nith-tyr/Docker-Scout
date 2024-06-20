@@ -28,8 +28,8 @@ jobs:
         id: docker-scout
         uses: docker/scout-action@v1
         with:
-            command: cves,recommendations,compare
-            to-latest: true
-            ignore-base: true
-            ignore-unchanged: true
-            only-fixed: true
+          image: postgres
+          ignore-unchanged: true
+          only-severities: critical,high,medium,low
+
+
