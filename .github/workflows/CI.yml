@@ -33,6 +33,8 @@ jobs:
           ignore-unchanged: true
           only-severities: critical,high,medium,low
           only-fixed: false
+          sarif-file: sarif.output.json
+          summary: true
 
 
 
