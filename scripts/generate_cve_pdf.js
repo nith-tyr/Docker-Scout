@@ -4,29 +4,30 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 
 // Define paths
-const zipFilePath = path.resolve('./sarif-results.zip'); // Path to ZIP file
-const extractedJsonPath = path.resolve('sarif-results.json');
+const zipFilePath = path.resolve('./sarif-results.zip');
+const extractedJsonPath = path.resolve('./sarif-results.json');
 
-// Step 1: Extract JSON from ZIP
+// Step 1: Extract JSON from ZIP with Enhanced Error Handling
 function extractJsonFromZip(zipPath, outputJsonPath) {
   try {
     const zip = new AdmZip(zipPath);
-    const zipEntries = zip.getEntries(); // Get all entries inside the ZIP
+    const zipEntries = zip.getEntries();
 
-    console.log('Contents of ZIP:');
-    zipEntries.forEach((entry) => console.log(`- ${entry.entryName}`)); // Log entries
+    console.log('ZIP Contents:');
+    zipEntries.forEach((entry) => console.log(`- ${entry.entryName}`)); // Log entries for inspection
 
-    // Handle possible nested directories in the ZIP
+    // Find the first JSON file, even if nested inside directories
     const jsonEntry = zipEntries.find(
-      (entry) => path.extname(entry.entryName).toLowerCase() === '.json'
+      (entry) =>
+        path.extname(entry.entryName).toLowerCase() === '.json' &&
+        !entry.isDirectory
     );
 
     if (!jsonEntry) {
-      console.error('No JSON file found in the ZIP!');
-      process.exit(1);
+      throw new Error('No JSON file found in the ZIP!');
     }
 
-    // Extract JSON data and write to output
+    // Extract JSON content
     const jsonData = jsonEntry.getData().toString('utf8');
     fs.writeFileSync(outputJsonPath, jsonData, 'utf8');
     console.log(`Extracted JSON to: ${outputJsonPath}`);
@@ -93,7 +94,7 @@ async function generatePdfFromJson(jsonPath) {
   }
 }
 
-// Run extraction and PDF generation
+// Run the extraction and PDF generation process
 extractJsonFromZip(zipFilePath, extractedJsonPath);
 generatePdfFromJson(extractedJsonPath).catch((err) => {
   console.error(`Error in PDF generation process: ${err.message}`);
