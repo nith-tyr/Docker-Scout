@@ -43,7 +43,7 @@ const generateCveHtmlReport = (cveData) => `
 (async () => {
   try {
     // Read the CVE data from scout-results.json
-    const rawData = fs.readFileSync('sarif.output.json');
+    const rawData = fs.readFileSync('sarif.result.json');
     const cveData = JSON.parse(rawData);
 
     const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
