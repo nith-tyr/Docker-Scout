@@ -33,12 +33,12 @@ jobs:
           ignore-unchanged: true
           only-severities: critical,high,medium,low
           only-fixed: false
-          sarif-file: sarif.output.pdf
+          sarif-file: sarif.output.json
           summary: true
 
       - name: Verify SARIF File Exists
         run: |
-          if [ ! -f sarif.output.pdf ]; then
+          if [ ! -f sarif.output.json ]; then
             echo "SARIF file not found!"
             exit 1
           fi
@@ -48,24 +48,48 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: docker-scout-sarif
-          path: sarif.output.pdf
+          path: sarif.output.json
 
-      - name: Set up Python and Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wkhtmltopdf
-          python -m pip install --upgrade pip
-          pip install selenium pdfkit webdriver-manager
+      # - name: Set up Python and Install Dependencies
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y wkhtmltopdf
+      #     python -m pip install --upgrade pip
+      #     pip install selenium pdfkit webdriver-manager
 
       # - name: Generate PDF Report
       #   run: |
-      #     python generate_pdf.py sarif.output.jso
+      #     python generate_pdf.py sarif.output.json
           
-      - name: Upload PDF Artifact
+      # - name: Upload PDF Artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: Docker-Scout-Report
+      #     path: scout-report.pdf
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+           node-version: 16
+
+      - name: Install Puppeteer
+        run: |
+         cd scripts
+         npm install puppeteer
+
+      - name: Generate Docker Scout JSON Results (Simulated)
+        run: |
+         echo '[{ "id": "CVE-2021-1234", "severity": "High", "description": "Critical vulnerability in xyz", "package": "xyz" }, { "id": "CVE-2022-5678", "severity": "Medium", "description": "Issue in abc component", "package": "abc" }]' > sarif-results.json
+
+      - name: Run CVE PDF Generation Script
+        run: |
+         cd scripts
+         node generate_cve_pdf.js
+
+      - name: Upload CVE Report PDF
         uses: actions/upload-artifact@v3
         with:
-          name: Docker-Scout-Report
-          path: scout-report.pdf
-
+         name: docker-scout-cve-report
+         path: docker_scout_cve_report.pdf
 
 
