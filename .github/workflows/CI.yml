@@ -54,14 +54,20 @@ jobs:
         with:
           node-version: 16
 
-      - name: Install Puppeteer
+      - name: Install Dependencies
         run: |
           cd scripts
-          npm install puppeteer
+          npm install puppeteer adm-zip
 
-      - name: Generate Docker Scout JSON Results (Simulated)
-        run: |
-          echo '[{ "id": "CVE-2021-1234", "severity": "High", "description": "Critical vulnerability in xyz", "package": "xyz" }, { "id": "CVE-2022-5678", "severity": "Medium", "description": "Issue in abc component", "package": "abc" }]' > sarif-results.json
+      - name: Download ZIP Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-scout-sarif
+          path: ./  # Download to the current directory
+
+      # - name: Generate Docker Scout JSON Results (Simulated)
+      #   run: |
+      #     echo '[{ "id": "CVE-2021-1234", "severity": "High", "description": "Critical vulnerability in xyz", "package": "xyz" }, { "id": "CVE-2022-5678", "severity": "Medium", "description": "Issue in abc component", "package": "abc" }]' > sarif-results.json
 
       - name: Run CVE PDF Generation Script
         run: |
