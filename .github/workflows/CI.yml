@@ -59,7 +59,7 @@ jobs:
 
       - name: Run PDF Generation Script
         run: |
-          python scripts/generate_pdf.py "https://github.com/<your-repo>/actions/runs/<run-id>"
+          python ./generate_pdf.py "https://github.com/<your-repo>/actions/runs/<run-id>"
           
       - name: Upload PDF Artifact
         uses: actions/upload-artifact@v3
