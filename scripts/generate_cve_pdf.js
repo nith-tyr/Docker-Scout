@@ -4,7 +4,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 
 // Define paths
-const zipFilePath = path.resolve('./sarif-results.zip'); // Adjusted path to ZIP file
+const zipFilePath = path.resolve('./sarif-results.zip'); // Path to ZIP file
 const extractedJsonPath = path.resolve('./sarif-results.json');
 
 // Step 1: Extract JSON from ZIP
@@ -14,20 +14,24 @@ function extractJsonFromZip(zipPath, outputJsonPath) {
     const zipEntries = zip.getEntries(); // Get all entries inside the ZIP
 
     console.log('Contents of ZIP:');
-    zipEntries.forEach((entry) => console.log(entry.entryName)); // Log all entry names
+    zipEntries.forEach((entry) => console.log(`- ${entry.entryName}`)); // Log entries
 
-    // Search for the first JSON file inside the ZIP
-    const jsonEntry = zipEntries.find((entry) => entry.entryName.endsWith('.json'));
+    // Handle possible nested directories in the ZIP
+    const jsonEntry = zipEntries.find(
+      (entry) => path.extname(entry.entryName).toLowerCase() === '.json'
+    );
+
     if (!jsonEntry) {
-      console.error('JSON file not found in the ZIP!');
+      console.error('No JSON file found in the ZIP!');
       process.exit(1);
     }
 
-    // Extract and save the JSON file
-    fs.writeFileSync(outputJsonPath, jsonEntry.getData().toString('utf8'));
+    // Extract JSON data and write to output
+    const jsonData = jsonEntry.getData().toString('utf8');
+    fs.writeFileSync(outputJsonPath, jsonData, 'utf8');
     console.log(`Extracted JSON to: ${outputJsonPath}`);
   } catch (error) {
-    console.error('Error extracting JSON from ZIP:', error.message);
+    console.error(`Error extracting JSON from ZIP: ${error.message}`);
     process.exit(1);
   }
 }
@@ -37,7 +41,6 @@ async function generatePdfFromJson(jsonPath) {
   try {
     const jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 
-    // HTML template for the PDF report
     const htmlContent = `
       <html>
         <head>
@@ -77,7 +80,6 @@ async function generatePdfFromJson(jsonPath) {
       </html>
     `;
 
-    // Launch Puppeteer to generate the PDF
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setContent(htmlContent, { waitUntil: 'load' });
@@ -86,7 +88,7 @@ async function generatePdfFromJson(jsonPath) {
     console.log('PDF report generated: docker_scout_cve_report.pdf');
     await browser.close();
   } catch (error) {
-    console.error('Error generating PDF:', error.message);
+    console.error(`Error generating PDF: ${error.message}`);
     process.exit(1);
   }
 }
@@ -94,6 +96,6 @@ async function generatePdfFromJson(jsonPath) {
 // Run extraction and PDF generation
 extractJsonFromZip(zipFilePath, extractedJsonPath);
 generatePdfFromJson(extractedJsonPath).catch((err) => {
-  console.error('Error in PDF generation process:', err.message);
+  console.error(`Error in PDF generation process: ${err.message}`);
   process.exit(1);
 });
