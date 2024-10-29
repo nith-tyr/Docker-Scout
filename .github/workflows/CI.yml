@@ -38,7 +38,7 @@ jobs:
 
       - name: Verify SARIF File Exists
         run: |
-          if [ ! -f sarif.output.json ]; then
+          if [ ! -f sarif.output.pdf ]; then
             echo "SARIF file not found!"
             exit 1
           fi
@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: docker-scout-sarif
-          path: sarif.output.json
+          path: sarif.output.pdf
 
       - name: Set up Python and Install Dependencies
         run: |
@@ -57,9 +57,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install selenium pdfkit webdriver-manager
 
-      - name: Generate PDF Report
-        run: |
-          python generate_pdf.py sarif.output.json
+      # - name: Generate PDF Report
+      #   run: |
+      #     python generate_pdf.py sarif.output.jso
           
       - name: Upload PDF Artifact
         uses: actions/upload-artifact@v3
