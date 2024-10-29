@@ -4,7 +4,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 
 // Define paths
-const zipFilePath = path.resolve('./sarif-results.zip');  // Ensure correct path to the ZIP file
+const zipFilePath = path.resolve('./sarif-results.zip'); // Adjusted path to ZIP file
 const extractedJsonPath = path.resolve('./sarif-results.json');
 
 // Step 1: Extract JSON from ZIP
@@ -13,19 +13,19 @@ function extractJsonFromZip(zipPath, outputJsonPath) {
     const zip = new AdmZip(zipPath);
     const zipEntries = zip.getEntries(); // Get all entries inside the ZIP
 
-    // Search for the JSON file inside the ZIP
+    console.log('Contents of ZIP:');
+    zipEntries.forEach((entry) => console.log(entry.entryName)); // Log all entry names
+
+    // Search for the first JSON file inside the ZIP
     const jsonEntry = zipEntries.find((entry) => entry.entryName.endsWith('.json'));
     if (!jsonEntry) {
       console.error('JSON file not found in the ZIP!');
       process.exit(1);
     }
 
-    // Validate filename and write the extracted JSON data
-    const safeFilename = path.basename(jsonEntry.entryName); // Get a safe filename
-    const safeOutputPath = path.resolve(safeFilename);
-
-    fs.writeFileSync(safeOutputPath, jsonEntry.getData().toString('utf8'));
-    console.log(`Extracted ${safeFilename} to ${safeOutputPath}`);
+    // Extract and save the JSON file
+    fs.writeFileSync(outputJsonPath, jsonEntry.getData().toString('utf8'));
+    console.log(`Extracted JSON to: ${outputJsonPath}`);
   } catch (error) {
     console.error('Error extracting JSON from ZIP:', error.message);
     process.exit(1);
@@ -91,7 +91,7 @@ async function generatePdfFromJson(jsonPath) {
   }
 }
 
-// Run the extraction and PDF generation steps
+// Run extraction and PDF generation
 extractJsonFromZip(zipFilePath, extractedJsonPath);
 generatePdfFromJson(extractedJsonPath).catch((err) => {
   console.error('Error in PDF generation process:', err.message);
