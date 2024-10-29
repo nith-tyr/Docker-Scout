@@ -50,24 +50,22 @@ jobs:
           name: docker-scout-sarif
           path: sarif.output.json
 
-                
-      # - name: Install Puppeteer
-      #   run: |
-      #     sudo apt update
-      #     sudo apt install -y nodejs npm
-      #     npm install puppeteer
+      - name: Set up Python and Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wkhtmltopdf
+          python -m pip install --upgrade pip
+          pip install selenium pdfkit webdriver-manager
 
-      # - name: Generate PDF
-      #   run: |
-      #     node generate_pdf.js
-
-      # - name: Upload PDF as artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: docker-scout-report
-      #     path: docker_scout_report.pdf
-      #     sarif-file: sarif.output.json
-      #     summary: true
+      - name: Run PDF Generation Script
+        run: |
+          python scripts/generate_pdf.py "https://github.com/<your-repo>/actions/runs/<run-id>"
+          
+      - name: Upload PDF Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Docker-Scout-Report
+          path: scout-report.pdf
 
 
 
