@@ -33,6 +33,23 @@ jobs:
           ignore-unchanged: true
           only-severities: critical,high,medium,low
           only-fixed: false
+
+      
+      - name: Install Puppeteer
+        run: |
+          sudo apt update
+          sudo apt install -y nodejs npm
+          npm install puppeteer
+
+      - name: Generate PDF
+        run: |
+          node generate_pdf.js
+
+      - name: Upload PDF as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-scout-report
+          path: docker_scout_report.pdf
           sarif-file: sarif.output.json
           summary: true
 
