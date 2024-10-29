@@ -62,7 +62,7 @@ jobs:
       - name: Download ZIP Artifact
         uses: actions/download-artifact@v3
         with:
-          name: docker-scout-sarif
+          name: sarif-results
           path: ./  # Download to the current directory
 
       # - name: Generate Docker Scout JSON Results (Simulated)
