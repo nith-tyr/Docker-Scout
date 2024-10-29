@@ -35,6 +35,21 @@ jobs:
           only-fixed: false
           sarif-file: sarif.output.json
           summary: true
+
+      - name: Verify SARIF File Exists
+        run: |
+          if [ ! -f sarif.output.json ]; then
+            echo "SARIF file not found!"
+            exit 1
+          fi
+
+      # Upload the SARIF file as an artifact for easy download
+      - name: Upload SARIF as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-scout-sarif
+          path: sarif.output.json
+
                 
       # - name: Install Puppeteer
       #   run: |
