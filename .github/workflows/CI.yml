@@ -63,7 +63,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: sarif-results
-          path: ./  # Download to the current directory
+          path: ./sarif-results.zip  # Save the downloaded ZIP
 
       # - name: Generate Docker Scout JSON Results (Simulated)
       #   run: |
