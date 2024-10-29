@@ -3,7 +3,7 @@ const fs = require('fs');
 const puppeteer = require('puppeteer');
 
 // Path to the ZIP file and expected JSON file name
-const zipFilePath = '../sarif-results.zip'; // Adjust path as needed
+const zipFilePath = './sarif-results.zip'; // Adjust path as needed
 const extractedJsonPath = './sarif-results.json';
 
 // Step 1: Extract JSON from ZIP
