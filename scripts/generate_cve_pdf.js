@@ -31,6 +31,13 @@ function extractJsonFromZip(zipPath, outputJsonPath) {
     const jsonData = jsonEntry.getData().toString('utf8');
     fs.writeFileSync(outputJsonPath, jsonData, 'utf8');
     console.log(`Extracted JSON to: ${outputJsonPath}`);
+
+    // Checkpoint: Verify that the JSON file was extracted and is accessible
+    if (!fs.existsSync(outputJsonPath)) {
+      throw new Error('Checkpoint failed: Extracted JSON file is missing!');
+    }
+
+    console.log('Checkpoint passed: JSON file successfully extracted.');
   } catch (error) {
     console.error(`Error extracting JSON from ZIP: ${error.message}`);
     process.exit(1);
@@ -94,7 +101,7 @@ async function generatePdfFromJson(jsonPath) {
   }
 }
 
-// Run the extraction and PDF generation process
+// Run the extraction and PDF generation process with checkpoint validation
 extractJsonFromZip(zipFilePath, extractedJsonPath);
 generatePdfFromJson(extractedJsonPath).catch((err) => {
   console.error(`Error in PDF generation process: ${err.message}`);
