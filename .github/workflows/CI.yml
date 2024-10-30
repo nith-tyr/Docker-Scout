@@ -59,15 +59,21 @@ jobs:
           cd scripts
           npm install puppeteer adm-zip
 
-      - name: Download ZIP Artifact
+      
+      - name: Download SARIF ZIP Artifact
         uses: actions/download-artifact@v3
         with:
-          name: sarif-results
-          path: ./sarif-results.zip  # Save the downloaded ZIP
+          name: docker-scout-sarif
+          path: ./sarif-results.zip
 
-      # - name: Generate Docker Scout JSON Results (Simulated)
-      #   run: |
-      #     echo '[{ "id": "CVE-2021-1234", "severity": "High", "description": "Critical vulnerability in xyz", "package": "xyz" }, { "id": "CVE-2022-5678", "severity": "Medium", "description": "Issue in abc component", "package": "abc" }]' > sarif-results.json
+      - name: Extract JSON from ZIP
+        run: |
+          unzip ./scripts/sarif-results.zip -d ./scripts/
+          if [ ! -f /sarif-results.json ]; then
+            echo "JSON file not found in ZIP!"
+            exit 1
+          fi
+        shell: bash
 
       - name: Run CVE PDF Generation Script
         run: |
@@ -78,5 +84,25 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: docker-scout-cve-report
-          path: docker_scout_cve_report.pdf
-          if-no-files-found: error
+          path: ./scripts/docker_scout_cve_report.pdf
+      # - name: Download ZIP Artifact
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: sarif-results
+      #     path: ./sarif-results.zip  # Save the downloaded ZIP
+
+      # # - name: Generate Docker Scout JSON Results (Simulated)
+      # #   run: |
+      # #     echo '[{ "id": "CVE-2021-1234", "severity": "High", "description": "Critical vulnerability in xyz", "package": "xyz" }, { "id": "CVE-2022-5678", "severity": "Medium", "description": "Issue in abc component", "package": "abc" }]' > sarif-results.json
+
+      # - name: Run CVE PDF Generation Script
+      #   run: |
+      #     cd scripts
+      #     node generate_cve_pdf.js
+
+      # - name: Upload CVE Report PDF
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: docker-scout-cve-report
+      #     path: docker_scout_cve_report.pdf
+      #     if-no-files-found: error
