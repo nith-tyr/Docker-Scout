@@ -68,12 +68,11 @@ jobs:
 
       - name: Extract JSON from ZIP
         run: |
-          unzip sarif-results.zip 
-          if [ ! -f sarif-results.json ]; then
+          unzip ./scripts/sarif-results.zip -d ./scripts/
+          if [ ! -f ./scripts/sarif-results.json ]; then
             echo "JSON file not found in ZIP!"
             exit 1
           fi
-        shell: bash
 
       - name: Run CVE PDF Generation Script
         run: |
