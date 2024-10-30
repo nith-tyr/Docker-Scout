@@ -4,7 +4,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 
 // Define paths
-const zipFilePath = path.resolve('/home/runner/work/Docker-Scout/Docker-Scout/sarif-results.zip');
+const zipFilePath = path.resolve('./sarif-results.zip');
 const extractedJsonPath = path.resolve('./sarif-results.json');
 
 // Step 1: Extract JSON from ZIP with Enhanced Error Handling
