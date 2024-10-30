@@ -63,7 +63,7 @@ jobs:
       - name: Download SARIF ZIP Artifact
         uses: actions/download-artifact@v3
         with:
-          name: docker-scout-sarif
+          name: sarif-results
           path: ./sarif-results.zip
 
       - name: Extract JSON from ZIP
