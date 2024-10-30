@@ -68,8 +68,8 @@ jobs:
 
       - name: Extract JSON from ZIP
         run: |
-          unzip ./scripts/sarif-results.zip -d ./scripts/
-          if [ ! -f /sarif-results.json ]; then
+          unzip sarif-results.zip -d 
+          if [ ! -f sarif-results.json ]; then
             echo "JSON file not found in ZIP!"
             exit 1
           fi
