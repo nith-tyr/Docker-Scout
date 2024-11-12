@@ -9,6 +9,8 @@ on:
 jobs:
   trigger_pipeline:
     runs-on: ubuntu-latest
+    permissions:
+     issues: write
 
     steps:
       # - name: Checkout
