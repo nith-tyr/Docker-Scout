@@ -110,5 +110,5 @@ jobs:
       - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.11.0
         with:
-         target: 'https://www.blazedemo.com'
+         target: 'http://www.itsecgames.com/'
       
