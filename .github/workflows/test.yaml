@@ -1,4 +1,4 @@
-name: ZAP Scan with Filtered Report
+name: ZAP Scan with Severity Filtering
 
 on:
   workflow_dispatch:  # Allows manual trigger from the GitHub UI
@@ -14,9 +14,9 @@ jobs:
       - name: Set up ZAP Scan
         uses: zaproxy/action-full-scan@v0.11.0
         with:
-          target: 'https://igsglobal.com/'
+          target: 'http://www.itsecgames.com/'
           format: 'json'
-          report: 'zap_report.zip'  # ZAP generates a .zip file
+          report: 'zap_report.zip'
 
       - name: Install jq
         run: |
