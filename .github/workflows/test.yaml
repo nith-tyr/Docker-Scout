@@ -1,0 +1,43 @@
+name: ZAP Scan with Filtered Report
+
+on:
+  push:
+    branches:
+      - Testing
+
+jobs:
+  zap_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up ZAP Scan
+        uses: zaproxy/action-full-scan@v0.11.0
+        with:
+          target: 'http://www.itsecgames.com/'
+          format: 'json'
+          report: 'zap_report.json'
+
+      - name: Install jq
+        run: |
+          sudo apt-get install jq
+
+      - name: Filter Medium and High Defects (exclude Low)
+        run: |
+          jq '{
+            site: [
+              {
+                alerts: [
+                  .site[].alerts[] | select(.risk == "Medium" or .risk == "High")
+                ]
+              }
+            ]
+          }' zap_report.json > filtered_zap_report.json
+
+      - name: Upload Filtered Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: filtered_zap_report
+          path: filtered_zap_report.json
