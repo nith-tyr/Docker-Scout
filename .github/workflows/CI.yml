@@ -107,8 +107,20 @@ jobs:
       #     name: docker-scout-cve-report
       #     path: docker_scout_cve_report.pdf
       #     if-no-files-found: error
-      - name: ZAP Scan
+      - name: ZAP Full Scan
         uses: zaproxy/action-full-scan@v0.11.0
         with:
-         target: 'https://igsglobal.com/'
+          target: 'https://igsglobal.com/'
+          format: 'json'
+          report: 'zap_report.json'
+
+      - name: Filter Low and High Defects
+        run: |
+          python filter_zap_defects.py zap_report.json filtered_zap_report.json
+
+      - name: Upload Filtered Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: filtered_zap_report
+          path: filtered_zap_report.json
       
