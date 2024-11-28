@@ -1,9 +1,7 @@
-name: ZAP Scan with Filtered Report
+name: ZAP Scan with Severity
 
 on:
-  push:
-    branches:
-      - Testing
+  workflow_dispatch:  # Allows manual trigger from the GitHub UI
 
 jobs:
   zap_scan:
@@ -13,32 +11,42 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'  # You can specify a specific version if needed
-
-      - name: Install dependencies (if any)
-        run: |
-          pip install --upgrade pip  # Upgrading pip
-          # Install any dependencies (if necessary)
-      
-      - name: ZAP Full Scan
+      - name: Set up ZAP Scan
         uses: zaproxy/action-full-scan@v0.11.0
         with:
-          target: 'http://www.itsecgames.com/'
+          target: 'https://igsglobal.com/'
           format: 'json'
-          report: 'zap_report.json'
+          report: 'zap_report.zip'  # ZAP generates a .zip file
 
-      - name: List Current Directory
-        run: ls -la
-
-      - name: Filter High and Medium Defects (exclude Low)
+      - name: Install jq
         run: |
-          python ./scripts/filter_zap_defects.py zap_report.json filtered_zap_report.json
+          sudo apt-get update
+          sudo apt-get install -y jq
 
-      - name: Upload Filtered Report
+      - name: Extract the ZIP report
+        run: |
+          mkdir zap_report
+          unzip zap_scan -d zap_report
+
+      - name: Filter Medium and High Defects (exclude Low)
+        run: |
+          jq '{
+            site: [
+              {
+                alerts: [
+                  .site[].alerts[] | select(.risk == "Medium" or .risk == "High")
+                ]
+              }
+            ]
+          }' zap_report/zap_report.json > zap_report/filtered_zap_report.json
+
+      - name: Re-zip the Filtered Report
+        run: |
+          cd zap_report
+          zip -r filtered_zap_report.zip filtered_zap_report.json
+
+      - name: Upload Filtered ZIP Report
         uses: actions/upload-artifact@v3
         with:
-          name: filtered_zap_report
-          path: filtered_zap_report.json
+          name: filtered_zap_scan
+          path: zap_report/filtered_zap_report.zip
