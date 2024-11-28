@@ -1,9 +1,7 @@
 name: ZAP Scan with Filtered Report
 
 on:
-  push:
-    branches:
-      - Testing
+  workflow_dispatch:  # Allows manual trigger from the GitHub UI
 
 jobs:
   zap_scan:
@@ -16,13 +14,19 @@ jobs:
       - name: Set up ZAP Scan
         uses: zaproxy/action-full-scan@v0.11.0
         with:
-          target: 'http://www.itsecgames.com/'
+          target: 'https://igsglobal.com/'
           format: 'json'
-          report: 'zap_report.json'
+          report: 'zap_report.zip'  # ZAP generates a .zip file
 
       - name: Install jq
         run: |
-          sudo apt-get install jq
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Extract the ZIP report
+        run: |
+          mkdir zap_report
+          unzip zap_report.zip -d zap_report
 
       - name: Filter Medium and High Defects (exclude Low)
         run: |
@@ -34,10 +38,15 @@ jobs:
                 ]
               }
             ]
-          }' zap_report.json > filtered_zap_report.json
+          }' zap_report/zap_report.json > zap_report/filtered_zap_report.json
 
-      - name: Upload Filtered Report
+      - name: Re-zip the Filtered Report
+        run: |
+          cd zap_report
+          zip -r filtered_zap_report.zip filtered_zap_report.json
+
+      - name: Upload Filtered ZIP Report
         uses: actions/upload-artifact@v3
         with:
-          name: filtered_zap_report
-          path: filtered_zap_report.json
+          name: filtered_zap_scan
+          path: zap_report/filtered_zap_report.zip
