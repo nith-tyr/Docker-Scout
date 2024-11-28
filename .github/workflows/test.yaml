@@ -1,7 +1,9 @@
 name: ZAP Scan with Severity Filtering
 
-on:
-  workflow_dispatch:  # Allows manual trigger from the GitHub UI
+on:  
+  push:
+    branches: [Testing]
+
 
 jobs:
   zap_scan:
