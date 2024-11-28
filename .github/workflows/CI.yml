@@ -2,9 +2,9 @@ name: Docker_Scout
 
 on:  
   push:
-    branches: [ZAP]
+    branches: [Testing]
   pull_request:
-    branches: [ZAP]
+    branches: [Testing]
 
 jobs:
   trigger_pipeline:
