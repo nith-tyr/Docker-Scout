@@ -21,7 +21,7 @@ jobs:
           target: 'http://www.itsecgames.com/'   # URL of the target to scan
           format: 'json'                    # Output format
           report: 'zap_report.zip'          # Report filename
-          excludedRule: '10010,10020'       # List of Plugin IDs to ignore
+          excludedRule: '40038'       # List of Plugin IDs to ignore
           onlySeverities: 'High,Medium'     # Include only High and Medium severity alerts
 
       # Step 3: Upload the Report as Artifact
