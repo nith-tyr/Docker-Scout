@@ -14,11 +14,11 @@ jobs:
     steps:
       # Step 1: Checkout Code
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Step 2: Set up ZAP Scan
       - name: Set up ZAP Scan
-        uses: zaproxy/action-full-scan@v0.11.0
+        uses: zaproxy/action-full-scan@v0.12.0
         with:
           target: 'http://www.itsecgames.com/'  # URL of the target to scan
           onlySeverities: 'High,Medium'  
