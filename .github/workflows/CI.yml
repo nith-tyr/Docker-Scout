@@ -13,6 +13,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'  # You can specify a specific version if needed
+
+      - name: Install dependencies (if any)
+        run: |
+          pip install --upgrade pip  # Upgrading pip
+          # Install any dependencies (if necessary)
+      
       - name: ZAP Full Scan
         uses: zaproxy/action-full-scan@v0.11.0
         with:
@@ -25,7 +35,7 @@ jobs:
 
       - name: Filter High and Medium Defects (exclude Low)
         run: |
-          python filter_zap_defects.py zap_report.json filtered_zap_report.json
+          python ./scripts/filter_zap_defects.py zap_report.json filtered_zap_report.json
 
       - name: Upload Filtered Report
         uses: actions/upload-artifact@v3
