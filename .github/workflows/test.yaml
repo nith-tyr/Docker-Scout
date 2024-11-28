@@ -1,7 +1,9 @@
-name: ZAP Scan with Plugin ID Exclusions
+name: ZAP Scan with Ignored Plugin IDs
 
 on:
-  workflow_dispatch:  # Allows manual trigger from the GitHub UI
+  push:
+   branches:
+   - Testing # Manual trigger support
 
 jobs:
   zap_scan:
@@ -12,20 +14,19 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Run ZAP Full Scan with Excluded Rules
+      # Step 2: Run ZAP Full Scan
       - name: Run ZAP Scan
-        run: |
-          docker run -v $(pwd):/zap/wrk:rw \
-          -t owasp/zap2docker-stable zap-full-scan.py \
-          -t http://www.itsecgames.com/ \
-          -r zap_report.html \
-          --exclude-rule 10038 \
-          --exclude-rule 40038 \
-          --alert-level High
+        uses: zaproxy/action-full-scan@v0.11.0
+        with:
+          target: 'https://igsglobal.com/'   # URL of the target to scan
+          format: 'json'                    # Output format
+          report: 'zap_report.zip'          # Report filename
+          excludedRule: '10010,10020'       # List of Plugin IDs to ignore
+          onlySeverities: 'High,Medium'     # Include only High and Medium severity alerts
 
-      # Step 3: Upload Report as Artifact
+      # Step 3: Upload the Report as Artifact
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v3
         with:
           name: zap_scan_report
-          path: zap_report.html
+          path: zap_report.zip
