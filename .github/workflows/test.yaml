@@ -18,7 +18,7 @@ jobs:
       - name: Run ZAP Scan
         uses: zaproxy/action-full-scan@v0.11.0
         with:
-          target: 'https://igsglobal.com/'   # URL of the target to scan
+          target: 'http://www.itsecgames.com/'   # URL of the target to scan
           format: 'json'                    # Output format
           report: 'zap_report.zip'          # Report filename
           excludedRule: '10010,10020'       # List of Plugin IDs to ignore
