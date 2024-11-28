@@ -1,39 +1,31 @@
-name: ZAP Scan with Severity Filtering
+name: ZAP Scan with Plugin ID Exclusions
 
-on:  
-  push:
-    branches: [Testing]
-
+on:
+  workflow_dispatch:  # Allows manual trigger from the GitHub UI
 
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
-    permissions:
-     issues: write
 
     steps:
       # Step 1: Checkout Code
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-
-       # Step 2: Create Context File to Exclude Plugin IDs
-      - name: Create Exclusion Context File
+      # Step 2: Run ZAP Full Scan with Excluded Rules
+      - name: Run ZAP Scan
         run: |
-          echo "rules:
-          - id: 40038
-            action: ignore
-          - id: 10038
-            action: ignore" > zap_ignore.yaml
+          docker run -v $(pwd):/zap/wrk:rw \
+          -t owasp/zap2docker-stable zap-full-scan.py \
+          -t http://www.itsecgames.com/ \
+          -r zap_report.html \
+          --exclude-rule 10038 \
+          --exclude-rule 40038 \
+          --alert-level High
 
-      # Step 2: Set up ZAP Scan
-      - name: Set up ZAP Scan
-        uses: zaproxy/action-full-scan@v0.12.0
+      # Step 3: Upload Report as Artifact
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v3
         with:
-          target: 'http://www.itsecgames.com/'  # URL of the target to scan
-          configFile: './zap_ignore.yaml'
-          onlySeverities: 'High,Medium' 
-          # excludedRule: '40038' 
-
-
-
+          name: zap_scan_report
+          path: zap_report.html
