@@ -1,33 +1,38 @@
-name: ZAP Scan Filter
+name: ZAP Scan with Severity Filtering
+
 on:
-  push:
-    branches: [Testing]
+  workflow_dispatch:  # Allows manual trigger from the GitHub UI
 
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout Code
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # Step 2: Set up ZAP Scan
       - name: Set up ZAP Scan
         uses: zaproxy/action-full-scan@v0.11.0
         with:
-          target: 'http://www.itsecgames.com/'
-          format: 'json'
-          report: 'zap_report.zip'
+          target: 'http://www.itsecgames.com/'  # URL of the target to scan
+          format: 'json'                   # Output format set to JSON
+          report: 'zap_report.zip'         # Output report in a ZIP file
 
+      # Step 3: Install jq for JSON processing
       - name: Install jq
         run: |
           sudo apt-get update
           sudo apt-get install -y jq
 
+      # Step 4: Extract the ZIP report
       - name: Extract the ZIP report
         run: |
           mkdir zap_report
           unzip zap_report.zip -d zap_report
 
+      # Step 5: Filter Medium and High Defects (exclude Low)
       - name: Filter Medium and High Defects (exclude Low)
         run: |
           jq '{
@@ -40,13 +45,15 @@ jobs:
             ]
           }' zap_report/zap_report.json > zap_report/filtered_zap_report.json
 
+      # Step 6: Re-zip the filtered report
       - name: Re-zip the Filtered Report
         run: |
           cd zap_report
           zip -r filtered_zap_report.zip filtered_zap_report.json
 
+      # Step 7: Upload the filtered ZIP report as an artifact
       - name: Upload Filtered ZIP Report
         uses: actions/upload-artifact@v3
         with:
-          name: filtered_zap_scan
-          path: zap_report/filtered_zap_report.zip
+          name: filtered_zap_scan   # Name of the artifact
+          path: zap_report/filtered_zap_report.zip  # Path to the filtered zip report
