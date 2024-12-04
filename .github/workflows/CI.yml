@@ -114,13 +114,27 @@ jobs:
           format: 'json'
           report: 'zap_report.json'
 
-      - name: Filter Low and High Defects
-        run: |
-          python filter_zap_defects.py zap_report.json filtered_zap_report.json
+      # - name: Filter Low and High Defects
+      #   run: |
+      #     python filter_zap_defects.py zap_report.json filtered_zap_report.json
 
-      - name: Upload Filtered Report
-        uses: actions/upload-artifact@v3
+      # - name: Upload Filtered Report
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: filtered_zap_report
+      #     path: filtered_zap_report.json
+
+      - name: Download ZAP Scan Artifact
+        uses: actions/download-artifact@v3
         with:
-          name: filtered_zap_report
-          path: filtered_zap_report.json
+          name: zap_scan
+          path: zap_reports
+
+      - name: Verify ZAP JSON File
+        run: |
+          if [ ! -f "zap_reports/zap.json" ]; then
+            echo "ZAP JSON file not found!"
+            exit 1
+          fi
+          echo "ZAP JSON file found: zap_reports/zap.json"
       
