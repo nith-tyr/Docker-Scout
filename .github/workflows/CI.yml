@@ -132,7 +132,7 @@ jobs:
 
       - name: Verify ZAP JSON File
         run: |
-          if [ ! -f "zap_reports/zap.json" ]; then
+          if [ ! -f "zap_reports/report_json.json" ]; then
             echo "ZAP JSON file not found!"
             exit 1
           fi
