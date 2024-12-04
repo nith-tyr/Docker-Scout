@@ -137,4 +137,14 @@ jobs:
             exit 1
           fi
           echo "ZAP JSON file found: zap_reports/zap.json"
+
+      - name: Install Python Dependencies
+        run: pip install requests
+
+      - name: Send ZAP Scan Report to InfluxDB
+        env:
+          INFLUX_URL: ${{ secrets.INFLUX_URL }}
+          INFLUX_TOKEN: ${{ secrets.INFLUX_TOKEN }}
+          INFLUX_ORG: ${{ secrets.INFLUX_ORG }}
+          INFLUX_BUCKET: ${{ secrets.INFLUX_BUCKET }}
       
