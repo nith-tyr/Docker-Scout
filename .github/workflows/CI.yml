@@ -141,7 +141,15 @@ jobs:
         run: |
           echo "Verifying directory structure..."
           ls -R
-
+      - name: Print ZAP Scan Report JSON
+        run: |
+         if [ -f "zap_reports/report_json.json" ]; then
+         echo "ZAP Report JSON Contents:"
+         cat zap_reports/report_json.json
+         else
+         echo "ZAP JSON report not found!"
+         exit 1
+         fi
       - name: Verify zap.py Exists
         run: |
           if [ ! -f "scripts/zap.py" ]; then
