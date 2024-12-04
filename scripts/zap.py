@@ -58,7 +58,7 @@ def send_to_influxdb(line_protocol_data):
 
 if __name__ == "__main__":
     # Path to the ZAP JSON report
-    zap_json_file = "zap_report.json"
+    zap_json_file = "report_json.json"
 
     if not os.path.exists(zap_json_file):
         print(f"Error: ZAP JSON report not found at {zap_json_file}")
