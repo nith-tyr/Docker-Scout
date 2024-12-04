@@ -147,5 +147,5 @@ jobs:
           INFLUX_TOKEN: ${{ secrets.INFLUX_TOKEN }}
           INFLUX_ORG: ${{ secrets.INFLUX_ORG }}
           INFLUX_BUCKET: ${{ secrets.INFLUX_BUCKET }}
-        run: ./scripts/process_zap.py
+        run: scripts/process_zap.py
       
