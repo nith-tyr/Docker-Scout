@@ -137,7 +137,19 @@ jobs:
             exit 1
           fi
           echo "ZAP JSON file found: zap_reports/zap.json"
+      - name: Verify Directory Structure
+        run: |
+          echo "Verifying directory structure..."
+          ls -R
 
+      - name: Verify zap.py Exists
+        run: |
+          if [ ! -f "scripts/zap.py" ]; then
+            echo "zap.py not found in scripts folder!"
+            exit 1
+          fi
+          echo "zap.py found!"
+          
       - name: Install Python Dependencies
         run: pip install requests
 
