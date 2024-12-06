@@ -218,7 +218,7 @@ jobs:
       # Step 3: Push JSON to InfluxDB
       - name: Upload JSON to InfluxDB
         run: |
-          JSON_FILE="path/to/your/file.json"
+          JSON_FILE="zap_reports/report_json.json"
           INFLUX_URL="${{ secrets.INFLUX_URL }}"
           ORG="${{ secrets.INFLUX_ORG }}"
           BUCKET="${{ secrets.INFLUX_BUCKET }}"
