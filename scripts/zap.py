@@ -1,48 +1,38 @@
+# convert_json_to_line_protocol.py
 import json
-import os
-import requests
+import time
 
-def send_json_to_influxdb(json_file):
-    try:
-        # Load the JSON data
-        with open(json_file) as f:
-            data = json.load(f)
+def json_to_line_protocol(json_file, measurement, output_file):
+    """
+    Converts a JSON file into InfluxDB line protocol format.
 
-        # Extract and format data for InfluxDB (adjust according to your JSON structure)
-        measurements = []
-        for alert in data.get("alerts", []):
-            measurement = "zap_alerts"
-            tags = f"severity={alert['riskLevel']},alert_id={alert['alertRef']}"
-            fields = f"description=\"{alert['description']}\""
-            line_protocol = f"{measurement},{tags} {fields}"
-            measurements.append(line_protocol)
+    Args:
+        json_file (str): Path to the input JSON file.
+        measurement (str): Measurement name for the line protocol.
+        output_file (str): Path where the output line protocol will be written.
+    """
+    with open(json_file, 'r') as f:
+        data = json.load(f)
 
-        # Send data to InfluxDB
-        influx_url = os.getenv('INFLUX_URL')
-        influx_token = os.getenv('INFLUX_TOKEN')
-        influx_org = os.getenv('INFLUX_ORG')
-        influx_bucket = os.getenv('INFLUX_BUCKET')
+    # Create a list to store line protocol entries
+    line_protocol = []
 
-        if not influx_url or not influx_token or not influx_org or not influx_bucket:
-            print("InfluxDB configuration missing")
-            return
+    # Loop through the JSON data (assuming it's a list of reports or records)
+    for item in data:
+        # Example assumption on the JSON structure (modify as per your structure)
+        tags = f"report_id={item.get('id', 'N/A')},type={item.get('type', 'N/A')}"
+        fields = f"value={item.get('value', 0)}"
+        timestamp = int(time.time() * 1e9)  # Current time in nanoseconds
+        
+        # Construct line protocol entry
+        line = f"{measurement},{tags} {fields} {timestamp}"
+        line_protocol.append(line)
 
-        url = f"{influx_url}/api/v2/write?org={influx_org}&bucket={influx_bucket}&precision=s"
-        headers = {
-            "Authorization": f"Token {influx_token}",
-            "Content-Type": "text/plain"
-        }
-        data_payload = "\n".join(measurements)
+    # Write the line protocol to the output file
+    with open(output_file, 'w') as f:
+        f.write("\n".join(line_protocol))
+    print(f"Line protocol written to {output_file}")
 
-        response = requests.post(url, headers=headers, data=data_payload)
-        if response.status_code != 204:
-            print(f"Failed to send data to InfluxDB: {response.status_code} - {response.text}")
-        else:
-            print("Data successfully sent to InfluxDB")
-    except Exception as e:
-        print(f"Error: {e}")
-
-
+# Run the function with the specified parameters
 if __name__ == "__main__":
-    json_file_path = "zap_reports/report_json.json"  # Path to your JSON file
-    send_json_to_influxdb(json_file_path)
+    json_to_line_protocol('zap_reports/report_json.json', 'zap_report', 'zap_reports/zap_report.lp')
