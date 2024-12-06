@@ -5,7 +5,7 @@ on:
     branches: [ZAP]
   pull_request:
     branches: [ZAP]
-
+    
 jobs:
   trigger_pipeline:
     runs-on: ubuntu-latest
