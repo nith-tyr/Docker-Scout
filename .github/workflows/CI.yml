@@ -169,44 +169,68 @@ jobs:
       #     INFLUX_BUCKET: ${{ secrets.INFLUX_BUCKET }}
       #   run: python scripts/zap.py
       
- # Upload JSON to InfluxDB
-      - name: Send JSON to InfluxDB
-        env:
-          INFLUX_TOKEN: ${{ secrets.INFLUX_TOKEN }}  # InfluxDB token from Secrets
+ # # Upload JSON to InfluxDB
+ #      - name: Send JSON to InfluxDB
+ #        env:
+ #          INFLUX_TOKEN: ${{ secrets.INFLUX_TOKEN }}  # InfluxDB token from Secrets
+ #        run: |
+ #          python3 <<EOF
+ #          import json
+ #          import requests
+
+ #          # Read the JSON file
+ #          with open('zap_reports/report_json.json', 'r') as file:
+ #              json_data = json.load(file)
+
+ #          # InfluxDB configurations
+ #          influx_url = "${{ secrets.INFLUX_URL }}"  # Update this to your InfluxDB URL
+ #          org = "${{ secrets.INFLUX_ORG }}"  # Replace with your InfluxDB organization
+ #          bucket = "${{ secrets.INFLUX_BUCKET }}"  # Replace with your bucket name
+ #          token = "${{ secrets.INFLUX_TOKEN }}"
+
+ #          # Prepare the payload for InfluxDB
+ #          points = []
+ #          for key, value in json_data.items():
+ #              if isinstance(value, dict):
+ #                  for subkey, subvalue in value.items():
+ #                      points.append(f"zap_results,{key}={subkey} value={subvalue}")
+ #              else:
+ #                  points.append(f"zap_results,key={key} value={value}")
+
+ #          # Write data to InfluxDB
+ #          headers = {
+ #              "Authorization": f"Token {token}",
+ #              "Content-Type": "text/plain"
+ #          }
+ #          write_url = f"{influx_url}/api/v2/write?org={org}&bucket={bucket}&precision=s"
+ #          response = requests.post(write_url, headers=headers, data="\n".join(points))
+
+          # if response.status_code == 204:
+          #     print("Data successfully written to InfluxDB!")
+          # else:
+          #     print(f"Failed to write data to InfluxDB: {response.status_code} - {response.text}")
+          # EOF
+
+          # Step 2: Install curl if not already available
+      - name: Install curl
+        run: sudo apt-get install -y curl
+
+      # Step 3: Push JSON to InfluxDB
+      - name: Upload JSON to InfluxDB
         run: |
-          python3 <<EOF
-          import json
-          import requests
-
-          # Read the JSON file
-          with open('zap_reports/report_json.json', 'r') as file:
-              json_data = json.load(file)
-
-          # InfluxDB configurations
-          influx_url = "${{ secrets.INFLUX_URL }}"  # Update this to your InfluxDB URL
-          org = "${{ secrets.INFLUX_ORG }}"  # Replace with your InfluxDB organization
-          bucket = "${{ secrets.INFLUX_BUCKET }}"  # Replace with your bucket name
-          token = "${{ secrets.INFLUX_TOKEN }}"
-
-          # Prepare the payload for InfluxDB
-          points = []
-          for key, value in json_data.items():
-              if isinstance(value, dict):
-                  for subkey, subvalue in value.items():
-                      points.append(f"zap_results,{key}={subkey} value={subvalue}")
-              else:
-                  points.append(f"zap_results,key={key} value={value}")
-
-          # Write data to InfluxDB
-          headers = {
-              "Authorization": f"Token {token}",
-              "Content-Type": "text/plain"
-          }
-          write_url = f"{influx_url}/api/v2/write?org={org}&bucket={bucket}&precision=s"
-          response = requests.post(write_url, headers=headers, data="\n".join(points))
-
-          if response.status_code == 204:
-              print("Data successfully written to InfluxDB!")
-          else:
-              print(f"Failed to write data to InfluxDB: {response.status_code} - {response.text}")
-          EOF
+          JSON_FILE="path/to/your/file.json"
+          INFLUX_URL="${{ secrets.INFLUX_URL }}"
+          ORG="${{ secrets.INFLUX_ORG }}"
+          BUCKET="${{ secrets.INFLUX_BUCKET }}"
+          TOKEN="${{ secrets.INFLUX_TOKEN }}"
+          
+          if [ -f "$JSON_FILE" ]; then
+            echo "zap_reports/report_json.json"
+            curl --request POST "$INFLUX_URL/api/v2/write?org=$ORG&bucket=$BUCKET&precision=s" \
+              --header "Authorization: Token $TOKEN" \
+              --header "Content-Type: application/json" \
+              --data-binary @"$JSON_FILE"
+          else
+            echo "JSON file not found!"
+            exit 1
+          fi
